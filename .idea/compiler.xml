@@ -9,8 +9,8 @@
         <module name="onallolabor" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="onallolabor" target="1.5" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="onallolabor" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
