@@ -6,6 +6,7 @@ import org.objectweb.asm.*;
  * Created by aronszabo on 03/04/2018.
  */
 public class MutationMethodVisitor extends MethodVisitor {
+    private Mutation mutation;
     private static String[] ops = {"NOP", "ACONST_NULL", "ICONST_M1", "ICONST_0", "ICONST_1", "ICONST_2", "ICONST_3",
             "ICONST_4", "ICONST_5", "LCONST_0", "LCONST_1", "FCONST_0", "FCONST_1", "FCONST_2", "DCONST_0", "DCONST_1","BIPUSH","SIPUSH","LDC","","","ILOAD","LLOAD","FLOAD","DLOAD","ALOAD","","","","","","","","","","","","","","","","","","","","",
             "IALOAD", "LALOAD", "FALOAD", "DALOAD", "AALOAD", "BALOAD", "CALOAD", "SALOAD", "ISTORE","LSTORE","FSTORE","DSTORE","ASTORE","","","","","","","","","","","","","","","","","","","","","IASTORE", "LASTORE",
@@ -22,18 +23,22 @@ public class MutationMethodVisitor extends MethodVisitor {
             "","MULTIANEWARRAY","IFNULL","IFNONNULL","",""};
 
 
-    public MutationMethodVisitor(int api, MethodVisitor methodVisitor) {
+    public MutationMethodVisitor(int api, MethodVisitor methodVisitor, Mutation mutation) {
         super(api, methodVisitor);
+        this.mutation=mutation;
     }
 
 
     @Override
     public void visitJumpInsn(int opcode, Label label) {
         // System.out.println("  JMP  " + ops[opcode] + " " + label);
-        if(opcode==Opcodes.IF_ICMPLE){
-            opcode=Opcodes.IF_ICMPGT;
-            System.out.println("  JMP  " + ops[opcode] + " " + label);
-            System.out.println("MUTATED");
+//        if(opcode==Opcodes.IF_ICMPLE){
+//            opcode=Opcodes.IF_ICMPGT;
+//            System.out.println("  JMP  " + ops[opcode] + " " + label);
+//            System.out.println("MUTATED");
+//        }
+        if(mutation.canMutate(label.toString(),opcode)){
+            opcode=mutation.mutate(label.toString(),opcode);
         }
         super.visitJumpInsn(opcode, label);
     }

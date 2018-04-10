@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class TestClassVisitor extends ClassVisitor{
     public static final int DEFAULT_API = 262144;
-    List<MethodId> visitedMethods = new LinkedList<MethodId>();
+    List<MethodId> visitedMethods = new LinkedList<>();
     String methodname;
     String testClassName;
 

@@ -17,9 +17,11 @@ import java.io.IOException;
 public class MutationClassVisitor extends ClassVisitor {
     public static final int DEFAULT_API = 262144;
     private MethodId mid;
-    public MutationClassVisitor(ClassVisitor classVisitor, MethodId mid) {
+    private Mutation mutation;
+    public MutationClassVisitor(ClassVisitor classVisitor, MethodId mid, Mutation m) {
         super(DEFAULT_API, classVisitor);
         this.mid=mid;
+        this.mutation=m;
     }
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
@@ -30,18 +32,25 @@ public class MutationClassVisitor extends ClassVisitor {
 
     public static void mutateMethod(MethodId mid, String cp) throws IOException {
         File originalFile = new File(cp+"/"+mid.owner+".class");
-        File renamedFile = new File(cp+"/"+mid.owner+".class.original");
+        File renamedOriginalFile = new File(cp+"/"+mid.owner+".class.original");
+        originalFile.renameTo(renamedOriginalFile);
+        Mutator mut = new Mutator();
+        Mutation m;
+        do{
+            m = mut.createMutation();
+            ClassReader cr = new ClassReader(new FileInputStream(renamedOriginalFile));
 
-        ClassReader cr = new ClassReader(new FileInputStream(originalFile));
+            ClassWriter cw = new ClassWriter(cr,0);
+            MutationClassVisitor cv = new MutationClassVisitor(cw, mid, m);
+            cr.accept(cv, 0);
+            byte[] newBytecode = cw.toByteArray();
 
-        ClassWriter cw = new ClassWriter(cr,0);
-        MutationClassVisitor cv = new MutationClassVisitor(cw, mid);
-        cr.accept(cv, 0);
-        byte[] newBytecode = cw.toByteArray();
-        originalFile.renameTo(renamedFile);
-        FileOutputStream fos = new FileOutputStream(originalFile);
-        fos.write(newBytecode);
-        fos.flush();
-        fos.close();
+            File mutationFile = new File(cp+"/"+mid.owner+".class."+m.label+".mutation");
+            FileOutputStream fos = new FileOutputStream(mutationFile);
+            fos.write(newBytecode);
+            fos.flush();
+            fos.close();
+        }while(!m.label.isEmpty());
+
     }
 }
