@@ -11,7 +11,7 @@ public class Mutation {
         this.mut = mut;
     }
     public boolean canMutate(String label, int opcode){
-        return (!mut.mutatedLabels.contains(label)) && mut.mutationOperators.containsKey(opcode);
+        return (!mut.mutatedLabels.contains(label)) && mut.mutationOperators.containsKey(opcode) && (!label.isEmpty());
     }
     public int mutate(String label, int opcode){
         this.label=label;

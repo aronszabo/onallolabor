@@ -16,4 +16,8 @@ public class Mutator {
     public Mutation createMutation(){
         return new Mutation(this);
     }
+    public void addMutationOperator(int original, int replacement){
+        mutationOperators.put(original,replacement);
+    }
+
 }

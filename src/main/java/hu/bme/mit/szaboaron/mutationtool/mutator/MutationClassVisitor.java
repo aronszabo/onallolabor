@@ -27,14 +27,14 @@ public class MutationClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         // System.out.println(name+" "+descriptor);
         // System.out.println(signature);
-        return new MutationMethodVisitor(DEFAULT_API, super.visitMethod(access, name, descriptor, signature, exceptions));
+        return new MutationMethodVisitor(DEFAULT_API, super.visitMethod(access, name, descriptor, signature, exceptions), mutation);
     }
 
-    public static void mutateMethod(MethodId mid, String cp) throws IOException {
+    public static void mutateMethod(MethodId mid, String cp, Mutator mut) throws IOException {
         File originalFile = new File(cp+"/"+mid.owner+".class");
         File renamedOriginalFile = new File(cp+"/"+mid.owner+".class.original");
         originalFile.renameTo(renamedOriginalFile);
-        Mutator mut = new Mutator();
+
         Mutation m;
         do{
             m = mut.createMutation();
@@ -44,13 +44,13 @@ public class MutationClassVisitor extends ClassVisitor {
             MutationClassVisitor cv = new MutationClassVisitor(cw, mid, m);
             cr.accept(cv, 0);
             byte[] newBytecode = cw.toByteArray();
-
+            if(m.label.isEmpty())break;
             File mutationFile = new File(cp+"/"+mid.owner+".class."+m.label+".mutation");
             FileOutputStream fos = new FileOutputStream(mutationFile);
             fos.write(newBytecode);
             fos.flush();
             fos.close();
-        }while(!m.label.isEmpty());
+        }while(true);//!m.label.isEmpty()
 
     }
 }

@@ -7,6 +7,7 @@ import org.objectweb.asm.*;
  */
 public class MutationMethodVisitor extends MethodVisitor {
     private Mutation mutation;
+    private int opCounter=0;
     private static String[] ops = {"NOP", "ACONST_NULL", "ICONST_M1", "ICONST_0", "ICONST_1", "ICONST_2", "ICONST_3",
             "ICONST_4", "ICONST_5", "LCONST_0", "LCONST_1", "FCONST_0", "FCONST_1", "FCONST_2", "DCONST_0", "DCONST_1","BIPUSH","SIPUSH","LDC","","","ILOAD","LLOAD","FLOAD","DLOAD","ALOAD","","","","","","","","","","","","","","","","","","","","",
             "IALOAD", "LALOAD", "FALOAD", "DALOAD", "AALOAD", "BALOAD", "CALOAD", "SALOAD", "ISTORE","LSTORE","FSTORE","DSTORE","ASTORE","","","","","","","","","","","","","","","","","","","","","IASTORE", "LASTORE",
@@ -27,8 +28,20 @@ public class MutationMethodVisitor extends MethodVisitor {
         super(api, methodVisitor);
         this.mutation=mutation;
     }
-
-
+    private int mutate(int opcode){
+        opCounter++;
+        String opLabel = "OP" + opCounter;
+        if(mutation.canMutate(opLabel,opcode)){
+            return mutation.mutate(opLabel,opcode);
+        }
+        return opcode;
+    }
+    @Override
+    public void visitLabel(Label label) {
+        //opLabel = label.toString();
+        //CRAZY: minden alkalommal mas lesz a label es tobb tizezer mutans jon letre
+        super.visitLabel(label);
+    }
     @Override
     public void visitJumpInsn(int opcode, Label label) {
         // System.out.println("  JMP  " + ops[opcode] + " " + label);
@@ -37,9 +50,12 @@ public class MutationMethodVisitor extends MethodVisitor {
 //            System.out.println("  JMP  " + ops[opcode] + " " + label);
 //            System.out.println("MUTATED");
 //        }
-        if(mutation.canMutate(label.toString(),opcode)){
-            opcode=mutation.mutate(label.toString(),opcode);
-        }
+        opcode=mutate(opcode);
         super.visitJumpInsn(opcode, label);
+    }
+    @Override
+    public void visitIntInsn(int opcode, int operand) {
+        opcode=mutate(opcode);
+        super.visitIntInsn(opcode, operand);
     }
 }
