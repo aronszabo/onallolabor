@@ -1,0 +1,46 @@
+
+Az alábbi script segítségével minden fájlnak köszönök az aktuális mappában.
+\begin{lstlisting}[frame=single,float=!ht]
+ls | while read i; do echo Szia $i; done
+\end{lstlisting}
+\subsubsection{Alfeladat 2}
+\begin{figure}[h]
+\begin{center}
+\includegraphics[height=2cm]{figures/BMElogo.png}
+\caption{A BME logója}
+\label{fig:BMElogo}
+\end{center}
+\end{figure}
+
+\section{Fejlesztői dokumentáció}
+\subsection{Feladat 1}
+Álljon itt egy lista vala.
+\begin{itemize}
+ \item \LaTeX
+ \item Foo, olvasható Lamport cikkéből. \cite{lamport94}
+\end{itemize}
+\begin{equation}
+x_1 = \frac{5 + \sqrt{25 - 4 \times 6}}{2} = 3
+\end{equation}
+
+Az alábbi programokkal dolgoztam:
+\begin{enumerate}
+\item Debian Linux 2.6.32-5-amd64
+\item Ez egy pelda felsorolas
+\end{enumerate}
+
+\subsection{Feladat 2}
+Ahogyan azt a \ref{fig:BMElogo}. ábrán láttuk...
+
+\begin{thebibliography}{9}
+\addcontentsline{toc}{section}{Hivatkozások}
+\bibliographystyle{plain}
+
+\bibitem{lamport94}
+  Leslie Lamport,
+  \emph{\LaTeX: A Document Preparation System}.
+  Addison Wesley, Massachusetts,
+  2nd Edition,
+  1994.
+
+\end{thebibliography}

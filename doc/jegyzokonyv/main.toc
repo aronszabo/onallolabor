@@ -1,0 +1,6 @@
+\select@language {magyar} \contentsline {section}{\numberline {1}Bevezet\IeC {\'e}s}{2}{section.1}
+\select@language {magyar} \contentsline {subsection}{\numberline {1.1}Motiv\IeC {\'a}ci\IeC {\'o} \IeC {\'e}s c\IeC {\'e}lkit\IeC {\H u}z\IeC {\'e}s}{2}{subsection.1.1}
+\select@language {magyar} \contentsline {section}{\numberline {2}Elterjedt mut\IeC {\'a}ci\IeC {\'o}s tesztel\IeC {\'e}si eszk\IeC {\"o}z\IeC {\"o}k}{2}{section.2}
+\select@language {magyar} \contentsline {section}{\numberline {3}Mut\IeC {\'a}ci\IeC {\'o}s tesztel\IeC {\'e}si eszk\IeC {\"o}z\IeC {\"o}k fel\IeC {\'e}p\IeC {\'\i }t\IeC {\'e}se}{2}{section.3}
+\select@language {magyar} \contentsline {section}{\numberline {4}Saj\IeC {\'a}t eszk\IeC {\"o}z fejleszt\IeC {\'e}se}{2}{section.4}
+\select@language {magyar} \contentsline {section}{\numberline {5}V\IeC {\'e}gsz\IeC {\'o}}{2}{section.5}
