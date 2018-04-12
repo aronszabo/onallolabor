@@ -32,8 +32,11 @@ public class MutationMethodVisitor extends MethodVisitor {
         opCounter++;
         String opLabel = "OP" + opCounter;
         if(mutation.canMutate(opLabel,opcode)){
-            return mutation.mutate(opLabel,opcode);
+            int mutated=mutation.mutate(opLabel,opcode);
+            System.out.println("CREATED MUTATION "+opLabel+" ("+ops[opcode]+"->"+ops[mutated]+")");
+            return mutated;
         }
+
         return opcode;
     }
     @Override

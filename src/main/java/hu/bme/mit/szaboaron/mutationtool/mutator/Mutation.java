@@ -5,13 +5,13 @@ package hu.bme.mit.szaboaron.mutationtool.mutator;
  */
 public class Mutation {
     Mutator mut;
-    String label="";
+    String label=null;
 
     public Mutation(Mutator mut) {
         this.mut = mut;
     }
     public boolean canMutate(String label, int opcode){
-        return (!mut.mutatedLabels.contains(label)) && mut.mutationOperators.containsKey(opcode) && (!label.isEmpty());
+        return (!mut.mutatedLabels.contains(label)) && mut.mutationOperators.containsKey(opcode) && (this.label==null);
     }
     public int mutate(String label, int opcode){
         this.label=label;

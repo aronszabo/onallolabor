@@ -44,8 +44,9 @@ public class MutationClassVisitor extends ClassVisitor {
             MutationClassVisitor cv = new MutationClassVisitor(cw, mid, m);
             cr.accept(cv, 0);
             byte[] newBytecode = cw.toByteArray();
-            if(m.label.isEmpty())break;
+            if(m.label==null)break;
             File mutationFile = new File(cp+"/"+mid.owner+".class."+m.label+".mutation");
+            System.out.println("WRITTEN "+mutationFile.getName());
             FileOutputStream fos = new FileOutputStream(mutationFile);
             fos.write(newBytecode);
             fos.flush();
