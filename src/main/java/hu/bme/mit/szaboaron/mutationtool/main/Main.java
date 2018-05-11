@@ -10,6 +10,7 @@ import jdk.internal.org.objectweb.asm.Opcodes;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -17,7 +18,13 @@ import java.util.List;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        List<MethodId> methods = TestClassVisitor.analyzeTest(new File(args[0]), args[1]);
+        List<MethodId> methods;
+        if (args.length>1){
+             methods = TestClassVisitor.analyzeTest(new File(args[0]), args[1]);
+        }else{
+             methods = TestClassVisitor.analyzeTest(new File(args[0]), "");
+        }
+
 
 
         String classpath=getClassesPath(new File(args[0]));
@@ -28,8 +35,19 @@ public class Main {
         mutator.addMutationOperator(Opcodes.IF_ICMPLE, Opcodes.IF_ICMPGT);
         mutator.addMutationOperator(Opcodes.IF_ICMPGT, Opcodes.IF_ICMPLE);
         mutator.addMutationOperator(Opcodes.IF_ICMPLT, Opcodes.IF_ICMPGE);
+        mutator.addMutationOperator(Opcodes.IFNE, Opcodes.IFEQ);
+        mutator.addMutationOperator(Opcodes.IFEQ, Opcodes.IFNE);
+        mutator.addMutationOperator(Opcodes.FADD, Opcodes.FSUB);
+        mutator.addMutationOperator(Opcodes.DADD, Opcodes.DSUB);
+        mutator.addMutationOperator(Opcodes.LADD, Opcodes.LSUB);
+        mutator.addMutationOperator(Opcodes.IADD, Opcodes.ISUB);
+        mutator.addMutationOperator(Opcodes.FSUB, Opcodes.FADD);
+        mutator.addMutationOperator(Opcodes.DSUB, Opcodes.DADD);
+        mutator.addMutationOperator(Opcodes.LSUB, Opcodes.LADD);
+        mutator.addMutationOperator(Opcodes.ISUB, Opcodes.IADD);
 
         for(MethodId method : methods){
+            System.out.println("METHOD "+method.owner+"/"+ method.name);
             MutationClassVisitor.mutateMethod(method,classpath,mutator);
         }
 

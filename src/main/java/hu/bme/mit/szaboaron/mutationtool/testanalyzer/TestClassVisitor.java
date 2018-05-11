@@ -1,9 +1,6 @@
 package hu.bme.mit.szaboaron.mutationtool.testanalyzer;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,9 +36,11 @@ public class TestClassVisitor extends ClassVisitor{
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-        if(!name.equals(methodname))return super.visitMethod(access, name, descriptor, signature, exceptions);
+        //System.out.println("@+"+signature);
+        if(!(name.equals(methodname) || methodname.equals("")))return super.visitMethod(access, name, descriptor, signature, exceptions);
         return new TestMethodVisitor(DEFAULT_API, super.visitMethod(access, name, descriptor, signature, exceptions),this); //;
     }
+
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
@@ -57,8 +56,8 @@ public class TestClassVisitor extends ClassVisitor{
     public static List<MethodId> analyzeTest(File f, String method) throws IOException {
         ClassReader cr = new ClassReader(new FileInputStream(f));
 
-        ClassWriter cw = new ClassWriter(cr,0);
-        TestClassVisitor cv = new TestClassVisitor(cw, method);
+        //ClassWriter cw = new ClassWriter(cr,0);
+        TestClassVisitor cv = new TestClassVisitor(null, method);
         cr.accept(cv, 0);
         return cv.getList();
     }

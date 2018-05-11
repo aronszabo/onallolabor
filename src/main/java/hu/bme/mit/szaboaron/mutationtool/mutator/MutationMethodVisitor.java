@@ -35,6 +35,8 @@ public class MutationMethodVisitor extends MethodVisitor {
             int mutated=mutation.mutate(opLabel,opcode);
             System.out.println("CREATED MUTATION "+opLabel+" ("+ops[opcode]+"->"+ops[mutated]+")");
             return mutated;
+        }else{
+            //System.out.println("NOT MUTATED "+opLabel+" ("+ops[opcode]+")");
         }
 
         return opcode;
@@ -60,5 +62,11 @@ public class MutationMethodVisitor extends MethodVisitor {
     public void visitIntInsn(int opcode, int operand) {
         opcode=mutate(opcode);
         super.visitIntInsn(opcode, operand);
+    }
+
+    @Override
+    public void visitInsn(int opcode) {
+        opcode=mutate(opcode);
+        super.visitInsn(opcode);
     }
 }
