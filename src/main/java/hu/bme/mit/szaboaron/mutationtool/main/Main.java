@@ -37,6 +37,10 @@ public class Main {
         mutator.addMutationOperator(Opcodes.IF_ICMPLT, Opcodes.IF_ICMPGE);
         mutator.addMutationOperator(Opcodes.IFNE, Opcodes.IFEQ);
         mutator.addMutationOperator(Opcodes.IFEQ, Opcodes.IFNE);
+        mutator.addMutationOperator(Opcodes.IFGE, Opcodes.IFLT);
+        mutator.addMutationOperator(Opcodes.IFLE, Opcodes.IFGT);
+        mutator.addMutationOperator(Opcodes.IFGT, Opcodes.IFLE);
+        mutator.addMutationOperator(Opcodes.IFLT, Opcodes.IFGE);
         mutator.addMutationOperator(Opcodes.FADD, Opcodes.FSUB);
         mutator.addMutationOperator(Opcodes.DADD, Opcodes.DSUB);
         mutator.addMutationOperator(Opcodes.LADD, Opcodes.LSUB);
