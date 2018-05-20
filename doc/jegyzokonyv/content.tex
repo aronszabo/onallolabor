@@ -4,7 +4,7 @@
 
 \section{Bevezetés}
 \subsection{Motiváció és célkitűzés}
-Az önálló laborom témájának a mutációs tesztelést választottam. Témalaborom alatt találkoztam ezzel a módszerrel, és úgy gondoltam, érdemes vele tovább foglalkozni. Célom a félévben elmélyülni ebben a témában, és egy saját mutációs tesztelő eszközt létrehozni. 
+Az önálló laborom témájának a mutációs tesztelést választottam. Témalaborom alatt találkoztam ezzel a módszerrel, és úgy gondoltam, érdemes vele tovább foglalkozni. Célom volt a félévben elmélyülni ebben a témában, és egy saját mutációs tesztelő eszközt létrehozni. 
 \subsection{A mutációs tesztelésről}
 Unit tesztelésnél a tesztkészlet minősége többféleképpen mérhető. Általában a programkód tesztek általi lefedettsége a meghatározó szempont, ezt egyszerűe és gyorsan lehet statikus analízis eszközökkel vizsgálni. A lefedettség-mérés viszont csak a lefutott kód hányadát nézi, a program és a tesztek összefüggését nem. Honnan tudjuk, hogy egy, a programban elkövetett hibát biztosan kiszűrnek-e a tesztesetek?
 
@@ -14,11 +14,62 @@ Mutánsok létrehozásakor mindig csak egy-egy utasítást változtatunk azokban
 
 A mutációs tesztelés egy nagy hátránya, hogy sokkal erőforrásigényesebb, mint egy szimpla lefedettség-mérés. Egy nagyobb program vagy programkönyvtár több ezer mutánssal rendelkezhet, és ezekre a teszteket egyenként végrehajtani igencsak hosszadalmas procedúra. 
 \section{Elterjedt mutációs tesztelési eszközök}
-A mutációs tesztelés ötlete több, mint 40 éves \cite{major_2011}, ez idő alatt különféle tudású mutációs teszteszközt fejlesztettek ki különböző programnyelvekhez. Elsősorban a Java nyelvhez fejlesztett eszközökre fókuszáltam, mert a JUnit környezettel már sok tapasztalatom volt, és így otthonosabban ki tudtam próbálni ezeket az eszközöket.
+A mutációs tesztelés ötlete több, mint 40 éves \cite{major_2011}, ez idő alatt különféle tudású mutációs teszteszközt fejlesztettek ki különböző programnyelvekhez. Elsősorban a Java nyelvhez fejlesztett eszközökre fókuszáltam, mert a JUnit környezettel már sok tapasztalatom volt, és így otthonosabban ki tudtam próbálni ezeket az eszközöket. Két eszközt vizsgáltam meg alaposabban, ezek a Major és a PIT.
 \subsection{MAJOR Mutation Framework}
-
+A Major egy fejlett mutációs tesztelőkörnyezet Java platformhoz. Sok szempontból optimalizált, hatékonyan és gyorsan állítja elő és futtatja a mutánsokat. Saját konfigurációs nyelvvel (Major Mutation Language) rendelkezik, amivel a mutációs operátorok részletekbe menően beállíthatóak. Saját beépített Java fordítójának köszönhetően fordítás közben hozza létre a mutációkat, az így előállított mutációk pedig jobban igazodnak a nyelv sajátosságaihoz, és a programozó által potenciálisan elkövethető hibákat fogják szimulálni. A beépített fordító sajnos a hátránya is, mert jelen pillanatban a Major utolsó verziója Java 1.7-es fordítót használ, és Java 1.8-as projektekhez nem használható. Apache Anttel és önmagában is futtatható (az indító shell script némi módosítása után), futása gyors. Az eredmények CSV fileokban állnak elő, amikből részletes statisztika készíthető. \cite{major_manual}
 \subsection{PITest}
+A PIT egy modernebb eszköz, a kettő közül ennek a használata jobban kézre állt. A Majortól eltérően itt a már lefordított bytekódon történik a mutációs tesztelés, a mutánsok a memóriában jönnek létre és több szálon hajtódnak végre. Mivel a bytekódban jönnek létre a muatációk, előfordulhatnak úgynevezett "junk" mutációk is, amik nem követhetők vissza a forráskódban elkövetett programozási hibákra, de a PIT algoritmusai ezeket képesek kiszűrni. Kényelmesen használható, Maven és Ant pluginokon kívül Eclipse és IntelliJ beépülők is készültek hozzá (habár ez utóbbinál a beállítási lehetőségek igen szegényesek). Mavenes indításnál az eszköz egyszerűbb paraméterei parancssorban adhatók meg~(lásd \ref{lst:pitest_bash}. shell script), a részletes beállítások, mint például a mutációs operátorok, a pom.xml-ben. Ha a program muatációja jellemzően végtelen ciklusokat eredményez, érdemes egy timeout paramétert megadni, ami idő letelte után a PIT leállítja a teszt processzt. \cite{pit_quickstart}
+
+\begin{lstlisting}[frame=single,float=!ht,caption={Példa a PITest paraméterezésére},captionpos=b,label={lst:pitest_bash},language=bash]
+mvn test
+mvn org.pitest:pitest-maven:mutationCoverage -DmaxDependencyDistance=1 -DtimeoutConstant=250
+\end{lstlisting}
+
+Lefuttattam a PIT-et egy olyan projektre, aminek fejlesztésében részt vettem (vasutas játék): a sorlefedettség 18\% (276/1495), a mutációs pontszám pedig 9\% (93/1007) volt. A lefedettség azért lett ilyen alacsony, mert Unit tesztek csak a kontroller és modell osztályokra léteztek, a program jelentős hányadát pedig UI kódok, segédeszközök tették ki. Az eredményt (\ref{lst:pitest_output}. részlet) megvizsgálva látható, hogy mely utasítások hatása nincs vizsgálva a teszt során (hiszen ha lenne, a mutáció során sikertelen lett volna a teszt). A kimutatásból visszakereshető a kódrészlet sorra pontosan, így a hiányosság nagyon gyorsan javítható.
+
+\begin{lstlisting}[frame=single,float=!ht,caption={PIT kimenete},captionpos=b,label={lst:pitest_output},language=bash]
+102	1. negated conditional - KILLED
+...
+116	1. removed call to serpenyoe/model/rails/Tunnel::setActive - KILLED
+117	1. removed call to serpenyoe/model/rails/Tunnel::setB - SURVIVED
+119	1. removed call to serpenyoe/model/Rail::setA - KILLED
+120	1. removed call to serpenyoe/model/Rail::setB - KILLED
+\end{lstlisting}
+
 \section{Saját eszköz megtervezése}
+Az önálló laborom egyik célja egy saját eszköz megtervezése és implementációja volt. Természetesen a piacon lévő eszközökhöz képest, amiket évek óta fejlesztenek és működésük nagymértékben optimalizált, jelentős egyszerűsítésekkel éltem. A fő szempont a mutációs tesztelés lépéseinek szemléltetése és egy működő prototípus elkészítése volt.
+
+A tevezés során is leginkább az egyszerűségre törekedtem, de ha kettő közül a jobb megoldás nem volt nagyságrendekkel nehezebb, inkább azt választottam. Megfigyeltem a fent említett eszközök működését, és felvázoltam a mutációs tesztelés egyes lépéseit (\ref{fig:steps}. ábra), valamint, hogy milyen lehetőségek vannak azok megvalósítására.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[node distance = 1cm, auto]
+    % Place nodes
+   
+    
+    \node [block] (coverage) {Code Coverage};
+    \node [block_rounded, below=of coverage] (tests) {JUnit tests};
+    \node [block, right=of coverage] (mutants) {Mutants};
+     \node [block_rounded, above=of coverage] (original) {Original code};
+    \node [block, right=of mutants] (evaluate) {Test evaluation};
+    \node [block_rounded, above=of evaluate] (operators) {Configuration\\ M.Operators};
+    \node [block, right=of evaluate, node distance=3cm] (mutscore) {Mutation score};
+    \node [block, below=of mutscore] (reports) {Reports};
+    % Draw edges
+    \path [line] (original) -- (coverage);
+    \path [line] (tests) --  (coverage);
+    \path [line] (coverage) -- (mutants);
+    \path [line] (original) -| (mutants);
+    \path [line] (operators) -| (mutants);
+    \path [line] (mutants) -- (evaluate);
+    \path [line] (tests) -| (evaluate);
+    \path [line] (evaluate) -- (mutscore);
+    \path [line] (mutscore) -- (reports);
+\end{tikzpicture}
+
+\caption{A mutációs tesztelés lépései} \label{fig:steps}
+\end{figure}
+
 \subsection{Forráskód vagy bytekód manipuláció?}
 A legfontosabb kérdés, hogy a manipulációt a szoftverfolyamat melyik fázisában hajtjuk végre: fordítás előtt, közben, vagy utána? Mindegyik módszernek megvan a maga előnye és hátránya, és mind sajátos megközelítést kívánnak, ezért ezt a kérdést a tervezés legelején el kellett dönteni.
 \subsubsection{Forráskód manipuláció}
@@ -29,16 +80,16 @@ A már lefordított program bytekódját egyszerű módosítani (akár framework
 Ha a mutációs eszköz a fordítóba van építve, az ötvözni tudja az előző két módszer jó tulajdonságait. Hátránya, hogy viszonylag bonyolult elkészíteni, és meglehetősen rugalmatlan (nem követi a Java verziószámokat, körülményes futtatni), és ilyenkor a mutánsokat fileba kell írni.
 \subsubsection{Döntés}
 A bytekód manipulációt választottam, mert alapvetően megfelel az igényeimnek, és elég egyszerű ahhoz, hogy az önálló labor alatt megvalósítható legyen.
-\subsection{Kódlefedettség}
+\subsection{Lefedett kódok azonosítása}
 Ahhoz, hogy tudjuk, a mutációkat hova kell beilleszteni a kódba, tudni kell, hogy a vizsgált tesztre mely részek fognak lefutni a programból. A célom az volt, hogy a mutációk csak a tesztosztállyal azonos packageban lévő osztályokon történjenek csak meg, elkerülve azt, hogy külső könyvtárakon és irreleváns kódokon is lefut az eszköz.
-\subsubsection{Statikus analízis}
-Megvizsgáljuk, hogy a teszt milyen függvényeket hív meg az eredeti programból. Ehhez vagy egy forráskód értelmezőre van szükség, vagy a bytekódból szűrjük ki más osztályok hívásait. Ki kell szűrni azokat a programrészeket (libraryket), amik nem tartoznak szorosan a vizsgált programhoz. Hibája, hogy az osztályok statikus inicializáló függvényét figyelmen kívül hagyja, mivel azokat nem hívja semmi \cite{so_you_want_to} .
-\subsubsection{Elnevezési konvenciók}
-A módszer lényege az, hogy a teszt/tesztkészlet nevéből konvenciók alapján következtetünk, melyik részek/osztályok fognak futni a programból. Ez a módszer igen pontatlan lehet, ha nem követjük pontosan a szabályokat. Előnye viszont, hogy igen egyszerű megvalósítani.
+\subsubsection{Statikus analízis alapján}
+Megvizsgáljuk, hogy a teszt milyen függvényeket hív meg az eredeti programból. Ehhez vagy egy forráskód értelmezőre van szükség, vagy a bytekódból gyűjtjük ki a más osztályokra mutató függvényhívásokat. Ki kell szűrni azokat a programrészeket (libraryket), amik nem tartoznak szorosan a vizsgált programhoz, például a tesztek és az osztály package egyezésének vizsgálatával. Hibája, hogy az osztályok statikus inicializáló függvényét figyelmen kívül hagyja, mivel azokat nem hívja semmi \cite{so_you_want_to}, de ez legtöbb esetben nem okoz problémát.
+\subsubsection{Elnevezési konvenciók alapján}
+A módszer lényege az, hogy a teszt/tesztkészlet nevéből konvenciók alapján következtetünk, melyik részek/osztályok fognak futni a programból. Legtöbb esetben a tesztosztály neve visszautal arra az osztályra vagy unitra, amihez tartozik, így ez a módszer a külső könyvtárakat, és a mutálni nem kívánt más programkódokat működéséből fakadóan kiszűri. Ez a módszer viszont igen pontatlan lehet, ha nem követjük pontosan az elnevezés szabályait. Előnye viszont, hogy igen egyszerű megvalósítani, csupán String-átalakítások szükségesek hozzá..
 \subsubsection{Döntés}
-Az ASM képes modellt alkotni a vizsgált bytekódról, tehát arra is megfelelő, hogy a tesztekben a programkód függvényeinek hívásait azonosítsuk vele. Mivel így nem járt többletmunkával, az előnyök miatt a statikus analízist választottam.
+Az ASM képes modellt alkotni a vizsgált bytekódról, tehát arra is megfelelő, hogy a tesztekben a programkód függvényeinek hívásait azonosítsuk vele. Mivel így nem járt többletmunkával, az előnyök miatt a statikus analízist választottam, azzal az egyszerűsítéssel, hogy csak a tesztből közvetlenül hívott függvényeken hajtódik végre mutáció.
 \subsection{Mutációs operátorok}
-Egy meglévő operátor készletet könnyen ki lehet egészíteni továbbiakkal, erre a projektre a feltétel negáló operátorokat, valamint néhány matematikai operátort valósítottam meg (a bytekód manipuláció miatt ezek JVM instrukciók, a típusnevek stacken lévő értékeket jelölnek):
+Egy meglévő operátor készletet könnyen ki lehet egészíteni továbbiakkal, erre a projektre a feltétel negáló operátorokat, néhány matematikai, valamint függvényhívás operátort valósítottam meg (a bytekód manipuláció miatt ezek JVM instrukciók, a típusnevek stacken lévő értékeket jelölnek):
 \begin{itemize}
   \item \lstinline{ if(int==int) } $ \rightarrow $ \lstinline{ if(int!=int) }
   \item \lstinline{ if(int!=int) } $ \rightarrow $ \lstinline{ if(int==int) }
@@ -52,6 +103,9 @@ Egy meglévő operátor készletet könnyen ki lehet egészíteni továbbiakkal,
   \item \lstinline{ if(int<=0) } $ \rightarrow $ \lstinline{ if(int>0) }
   \item \lstinline{ if(int>0) } $ \rightarrow $ \lstinline{ if(int<=0) }
   \item \lstinline{ if(int<0) } $ \rightarrow $ \lstinline{ if(int>=0) }
+    \item \lstinline{ if(Object==null) } $ \rightarrow $ \lstinline{ if(Object!=null) }
+    \item \lstinline{ if(Object!=null) } $ \rightarrow $ \lstinline{ if(Object==null) }
+        
   \item \lstinline{ float+float } $ \rightarrow $ \lstinline{ float-float }
   \item \lstinline{ double+double } $ \rightarrow $ \lstinline{ double-double }
   \item \lstinline{ long+long } $ \rightarrow $ \lstinline{ long-long }
@@ -60,17 +114,22 @@ Egy meglévő operátor készletet könnyen ki lehet egészíteni továbbiakkal,
   \item \lstinline{ double-double } $ \rightarrow $ \lstinline{ double+double }
   \item \lstinline{ long-long } $ \rightarrow $ \lstinline{ long+long }
   \item \lstinline{ int-int } $ \rightarrow $ \lstinline{ int+int }
+  
+    \item virtuális függvényhívás $ \rightarrow $ nincs művelet
+    \item interface függvényhívás $ \rightarrow $ nincs művelet
+        
 \end{itemize}
+Ezek azok az operátorok, amiket viszonylag könnyű volt implementálni, és a legtöbb programra hatékonyan működnek. 
 \subsection{Mutációk beillesztése kódba}
-Többféle módszer létezik a mutációk generálás utáni rendszerezésére, hogy később a futáskor kiválaszthatók legyenek.
+Fontos szempont, hogy a mutációkor létrehozott kódok később, a futáskor milyen módon lesznek azonosíthatóak. Többféle módszer létezik a mutációk generálás utáni rendszerezésére, hogy a tesztek futtatásakor kiválaszthatók legyenek.
 \subsubsection{Elágazás-struktúra}
 Az első esetben egy program jön létre, ami az összes mutációt tartalmazza elágazásos szerkezetben. Futáskor a megfelelő flag beállításával kiválasztható az az egy mutáció, ami le fog futni. A mutáció azonosítóját paraméterként kell átadni a programnak, és gondoskodni róla, hogy az flag formájában eljusson az elágazásig. A legtöbb teszteszköz ezt alkalmazza, mert hatékony, takarékos a tárhellyel. Emiatt, ha a mutációk a memóriában történnek, szinte csak ez jöhet szóba.
 \subsubsection{Külön fileba írás}
 Minden mutáció egy külön class filet kap. Az egyes mutációkat a filenév azonosítja. Ez a módszer több tárhelyet foglal, de egyszerűbben végrehajtható.
 \subsubsection{Döntés}
-Végül a fileba írás mellett döntöttem, mivel a JUniton keresztül körülményes a paraméterek átadása. Az egyes mutációk átmásolódnak az eredeti class helyére a JUnit futása előtt, a futás után pedig törlődnek.
+Végül a fileba írás mellett döntöttem, mivel a JUniton keresztül körülményes a paraméterek átadása. A mutációk átmásolódnak az eredeti class helyére a JUnit futása előtt, a futás után pedig törlődnek.
 \subsection{Tesztek futtatása, kiértékelése}
-
+Az eszköz a mutánsokat kiértékelteti a JUnit segítségével. Paraméterként a JUnitnak át kell adni valamilyen módon, hogy mit hajtson végre, a kimenenetét pedig értelmezni kell. Arra jutottam, hogy egy shell program segítségével ez egyszerűen megoldható, hiszen a mutáns a JUnit futása előtt másolással lett kiválasztva, a kimenetet (OK/Failed) pedig a grep segédprogram segítségével egyszerűen lehet értelmezni. A programom keretét ezért egy egyszerű shell script adja, és csak a mutációk előállítását fogja egy Java program végezni.
 \subsubsection{Felügyelet a futtatás felett, párhuzamos futtatás}
 Egy ciklus mutációjakor (vagy egyébként is) létrejöhet olyan helyzet, hogy a tesztelt program végtelen ciklusba kerül, vagy egyszerűen rendellenesen sokáig tart egy teszteset futása. Szükség lehet egy maximum futási idő meghatározására, ami után a főprogram kilövi a teszt processt. A tervezett operátorkészlet feltétel negáló operátorai sajnos potenciálisan előállíthatnak ilyen helyzetet. A fejlettebb teszteszközök képesek arra is, hogy több szálon, akár több processzormagot használva több mutációt futtatnak egyszerre. A processek párhuzamos kezelése viszont sajnos egy olyan extra funkció, ami nem férne bele az önálló labor kereteibe.
 \subsection{Kimenet formátuma}
@@ -82,21 +141,298 @@ A mutációs tesztelőeszközöm két fő részből áll: egy, a mutációkat el
 \subsection{ASM Framework}
 Ahhoz, hogy a Java bytekódhoz hatékonyan hozzáférhessek, az ASM Java Bytecode Manipulation Frameworköt használtam. Ez a könyvtár lehetővé teszi, hogy a kód manuális beolvasása helyett, a kódstruktúrát már feldolgozva kapjuk. A bytekód Visitor elvvel járhetó be, az egyes függvényeket, utasításokat könnyedén lehet egyenként kezelni. Így egyaránt alkalmas a tesztosztályok statikus analízisére és a mutációk végrehajtására is. A Visitor metódusokban eszközölt változások a végén visszaírhatók fileba.
 
-Az osztályok beolvasása és kiírása ClassReader és ClassWriter osztályokkal lehetséges. A bejárás során először a ClassVisitor osztály lép működésbe, ez lépked végig az osztály elemein. Szempontunkból a visitMethod függvény érdekes, ez adja tovább a vezérlést a MethodVisitor osztálynak. Ebben az egyes utasítások bejárására különböző paraméterezésű függvények vannak, amelyek OpCode paramétere azonosítja az utasításokat (Opcodes.IF\_ICMPEQ, Opcodes.FADD...), és itt le is cserélhetők bármelyik másikra. 
-\subsection{A mutánsokat előállító Java program}
+Az osztályok beolvasása és kiírása ClassReader és ClassWriter osztályokkal lehetséges~(\ref{lst:asm1}. kódrészlet). A bejárás során először a ClassVisitor osztály lép működésbe, ez lépked végig az osztály elemein. Szempontunkból a visitMethod függvény érdekes, ez adja tovább a vezérlést a MethodVisitor osztálynak. Ebben az egyes utasítások bejárására különböző paraméterezésű függvények vannak~(\ref{lst:asm2}. kódrészlet), amelyek OpCode paramétere azonosítja az utasításokat (Opcodes.IF\_ICMPEQ, Opcodes.FADD...), és itt le is cserélhetők bármelyik másikra. 
 
+
+\begin{lstlisting}[frame=single,float=!ht,caption={Java bytekód beolvasása, feldolgozása, kiíratása ASM segítségével},captionpos=b,label={lst:asm1}]
+ClassReader reader = new ClassReader(new FileInputStream(...));
+ClassWriter writer = new ClassWriter(reader, 0);
+ClassVisitor visitor = new ClassVisitor(writer);
+reader.accept(visitor, 0);
+byte[] newBytecode = writer.toByteArray();
+FileOutputStream output = new FileOutputStream(...);
+output.write(newBytecode);
+output.flush();
+output.close();
+\end{lstlisting}
+
+\begin{lstlisting}[frame=single,float=!ht,caption={A MethodVisitor általam használt bejáró függvényeinek fejlécei},captionpos=b,label={lst:asm2}]
+public void visitJumpInsn(int opcode, Label label);
+public void visitIntInsn(int opcode, int operand);
+public void visitInsn(int opcode);
+\end{lstlisting}
+
+\subsection{A mutánsokat előállító Java program}
+A Java programom az egyszerűbb adatátadás érdekében két egymásra épülő feladatot hajt végre: a lefedettség analízist, és a mutációk előállítását. A kódbázist ennek megfelelően két packagere osztottam fel: mutator és testanalyzer, ezek működése független egymástól, csak az adatmodell osztályon osztoznak. Ezen kívül egy harmadik package tartalmazza a kontroller Main függvényt~(\ref{lst:tool_main}. kódrészlet), aminek feladata a két feladat elindítása, köztük az adatáramlás biztosítása, valamint a mutator felkonfigurálása mutációs operátorokkal.
+
+\begin{lstlisting}[frame=single,float=!ht,caption={Main függvény},captionpos=b,label={lst:tool_main}]
+    public static void main(String[] args) throws Exception {
+        List<MethodId> methods;
+        methods = TestClassVisitor.analyzeTest(new File(args[0]), "");
+
+        Mutator mutator = new Mutator();
+        mutator.addMutationOperator(Opcodes.IF_ICMPEQ, Opcodes.IF_ICMPNE);
+        mutator.addMutationOperator(Opcodes.IF_ICMPNE, Opcodes.IF_ICMPEQ);
+        // ...
+        mutator.addMutationOperator(Opcodes.IFNONNULL, Opcodes.IFNULL);
+        mutator.addMutationOperator(Opcodes.INVOKEVIRTUAL, Opcodes.NOP);
+        mutator.addMutationOperator(Opcodes.INVOKEINTERFACE, Opcodes.NOP);
+        String classpath=getClassesPath(new File(args[0]));
+        for(MethodId method : methods){
+            MutationClassVisitor.mutateMethod(method, classpath, mutator);
+        }
+    }
+\end{lstlisting}
+
+A Main függvény parancssori paramétere egy tesztosztály elérési útja, az eszköz ezt fogja átvizsgálni, innen hivatkozott függvényekben a mutációkat végrehajtani, majd a mutáns classokat az eredetik könyvtárába kimenteni.
+
+Mindkét feladathoz az ASM keretrendszerre volt szükség: a statikus analízis és a mutációk előállítása is bytekód szinten valósul meg. A ClassVisitor és MethodVisitor osztályok leszármaztatásával ezekhez tudtam igazítani a kódok bejárását.
+\subsubsection{Statikus analízis}
+Ez a modul egy listába gyűjti a kapott teszt osztályban hivatkozott függvényeket a tesztelt programból. A visszatérő adatstruktúra minden lényeges információt tartalmaz ahhoz, hogy a Mutator modul a hivatkozott részletet megtalálhassa~(\ref{lst:tool_methodid}. kódrészlet).
+
+\begin{lstlisting}[frame=single,float=!ht,caption={MethodId adatstruktúra},captionpos=b,label={lst:tool_methodid}]
+public class MethodId {
+    public String owner;
+    public String name;
+    public String descriptor;
+    public boolean isInterface;
+    // ...
+}
+\end{lstlisting}
+
+A modul működése egyszerű: a TestClassVisitor~(\ref{lst:tool_testclassvisitor}. kódrészlet) meghívja az egyes JUnit tesztfüggvényekre a TestMethodVisitort~(\ref{lst:tool_testmethodvisitor}. kódrészlet), amiben a visitMethodInsn keresi a külső (eredeti programra hivatkozó) függvényhívásokat. A megtalált hívásokat visszajuttatja a TestClassVisitornak, mely megvizsgálja, hogy az megfelel-e a feltételeknek: a függvény osztálya azonos packageben legyen, mint a tesztosztály, illetve még ne szerepeljen a listában (mivel a mutációkat tesztosztályonként maximum egyszer szeretnénk csak végrehajtani).
+
+\begin{lstlisting}[frame=single,float=!ht,caption={TestClassVisitor},captionpos=b,label={lst:tool_testclassvisitor}]
+public class TestClassVisitor extends ClassVisitor{
+    List<MethodId> visitedMethods = new LinkedList<>();
+    // ...
+    public void pushMethod(MethodId method){
+        if(!checkPackage(method.owner))return;
+        for(MethodId mid : visitedMethods){
+            if(mid.equals(method))return;
+        }
+
+        visitedMethods.add(method);
+    }
+    @Override
+    public MethodVisitor visitMethod(int access, String name, String descriptor, 
+                                        String signature, String[] exceptions) {
+        // ...
+        return new TestMethodVisitor(DEFAULT_API, super.visitMethod(access, name, 
+                                     descriptor, signature, exceptions),this);
+    }
+    // ...
+}
+\end{lstlisting}
+\begin{lstlisting}[frame=single,float=!ht,caption={TestMethodVisitor},captionpos=b,label={lst:tool_testmethodvisitor}]
+public class TestMethodVisitor extends MethodVisitor {
+    // ...
+    @Override
+    public void visitMethodInsn(int opcode, String owner, String name, 
+                                  String descriptor, boolean isInterface) {
+        if(opcode== Opcodes.INVOKEVIRTUAL){
+            mtv.pushMethod(new MethodId(owner, name, descriptor, isInterface));
+        }
+        super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Mutator}
+
+A Main függvény a statikus analízis során kapott függvényekre sorban meghívja a mutateMethod függvényt~(\ref{lst:tool_mutatemethod}. kódrészlet). Ennek feladata a kapott függvény többszöri bejárása, egészen addig, amíg az összes lehetséges mutáció nem lett végrehajtva rajta. A mutáció adatait egy Mutation nevű adatstruktúra~(\ref{lst:tool_mutation_class}. kódrészlet) tartalmazza, ami a bejárás során~(\ref{lst:tool_mutationmethodvisitor}. kódrészlet) feltöltődik a megfelelő adatokkal. A Mutator osztály feladata a mutációs operátorok tárolása, valamint egy lista a már elvégzett mutációkról (hogy a bejárások során ugyanaz a mutáns ne jöjjön létre többször).
+\begin{lstlisting}[frame=single,float=!ht,caption={Mutate Method},captionpos=b,label={lst:tool_mutatemethod}]
+    public static void mutateMethod(MethodId mid, String cp, Mutator mut) throws IOException {
+        File originalFile = new File(cp+"/"+mid.owner+".class");
+        File renamedOriginalFile = new File(cp+"/"+mid.owner+".class.original");
+        originalFile.renameTo(renamedOriginalFile);
+
+        Mutation m;
+        do{
+            m = mut.createMutation();
+            ClassReader cr = new ClassReader(new FileInputStream(renamedOriginalFile));
+            ClassWriter cw = new ClassWriter(cr,0);
+            MutationClassVisitor cv = new MutationClassVisitor(cw, mid, m);
+            cr.accept(cv, 0);
+            byte[] newBytecode = cw.toByteArray();
+            if(m.label==null) break;
+            File mutationFile = new File(cp+"/"+mid.owner+".class."+m.label+".mutation");
+            FileOutputStream fos = new FileOutputStream(mutationFile);
+            fos.write(newBytecode);
+            fos.flush();
+            fos.close();
+        }while(true);
+    }
+\end{lstlisting}
+
+Az egyes mutációk egy sorszámmal lettek azonosítva, ami egyértelműen meghatározza a tartalmazó függvényt és a mutáció helyét. Ez az azonosító a Mutation osztályon keresztül jut el a mutateMethod függvényhez, ahol az a filenév részeként használja, és ez kerül bele a Mutator osztály listájába is. A canMutate függvény visszaadja, hogy a mutáció lehetséges-e vagy nem: az alapján, hogy volt-e már a mutáció, illetve az operátorok között szerepel-e. Ezután a mutate függvény visszaadja a megfelelő mutáns Opcodeot, és felveszi a mutációt a listába. Amennyiben az opcode változott, a visit metódusok visszatérte után az ASM keretrendszer végrehajtja a megfelelő változtatást a bytekódon.
+
+\begin{lstlisting}[frame=single,float=!ht,caption={MutationMethodVisitor},captionpos=b,label={lst:tool_mutationmethodvisitor}]
+public class MutationMethodVisitor extends MethodVisitor {
+    private Mutation mutation;
+    private int opCounter=0;
+    // ...
+    private int mutate(int opcode){
+        opCounter++;
+        String opLabel = "OP" + opCounter;
+        if(mutation.canMutate(opLabel,opcode)){
+            int mutated=mutation.mutate(opLabel, opcode);
+            return mutated;
+        }
+        return opcode;
+    }
+    // ...
+    @Override
+    public void visitIntInsn(int opcode, int operand) {
+        opcode=mutate(opcode);
+        super.visitIntInsn(opcode, operand);
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[frame=single,float=!ht,caption={A Mutation osztály},captionpos=b,label={lst:tool_mutation_class}]
+public class Mutation {
+    Mutator mut;
+    String label=null;
+
+    public Mutation(Mutator mut) {
+        this.mut = mut;
+    }
+    public boolean canMutate(String label, int opcode){
+        return (!mut.mutatedLabels.contains(label)) && mut.mutationOperators.containsKey(opcode) 
+                               && (this.label==null);
+    }
+    public int mutate(String label, int opcode){
+        this.label=label;
+        mut.mutatedLabels.add(label);
+        return mut.mutationOperators.get(opcode);
+
+    }
+}
+\end{lstlisting}
+A Java program futása során előálltak a mutáns classok, a megfelelő package könyvtárban, futásra készen.
 \subsection{Shell program}
-\section{Kipróbálás}
-\subsection{Saját kódok}
-\subsection{docx4j vagy mi a bánat}
+A shell script feladata a shellből egyszerűbben elvégezhető feladatok megoldása: a tesztosztályok, majd a mutánsok megtalálása (find), JUnit futtatása és az eredmények értelmezése (java+grep), mutációs pontszám összesítése (wc+grep). Az egyes string műveleteket reguláris kifejezésekkel végeztem.
+
+A JUnit futtatása minden egyes mutációra lezajlik, a megelelő mutáció bemásolódik az eredeti class helyére.  A program futásának végén helyreállnak az előzetesen kimentett eredeti class fileok.
+
+Az eredmények összesítése a projekten belül létrehozott mappában történt: megölt mutáció esetén a megfelelő classhoz tartozó fileba egy 1-es került, életben maradt mutánshoz 0. A végén az 1-esek aránya az összeshez jelentette a mutációs pontszámot.
+\begin{lstlisting}[frame=single,float=!ht,caption={Részlet a shell scriptből},captionpos=b,label={lst:tool_shell_junit},language=bash]
+  echo "RUNNING $(basename $mut) [$clsname]"
+  result=$(java -cp "$BASEDIR/lib/*:$1/target/test-classes:$1/target/classes" \
+                                       org.junit.runner.JUnitCore $2 | grep "Tests run\|OK")
+  if echo $result | grep "OK"; then
+    echo "0" >> "$1/target/arontest-reports/$clsname"
+  else
+    echo "1" >> "$1/target/arontest-reports/$clsname"
+  fi
+\end{lstlisting}
+
+\subsection{Kipróbálás}
+Az elkészült eszközt először egy nagyon egyszerű projekttel próbáltam, ami egyetlen függvényt tartalmazott. A függvényen belüli összehasonlító elágazásokkal jól lehetett szemléltetni a mutációs operátorok működését. 
+
+\begin{lstlisting}[frame=single,float=!ht,caption={Simple Class},captionpos=b,label={lst:simpleclass}]
+public class SimpleClass {
+    public int something(int param){
+        if(param<1) hey(1);
+        if(param>2){
+            return 2;
+        }else{
+            if(param==3)return 4;
+        }
+        return param;
+    }
+    void hey(int i){
+    }
+}
+\end{lstlisting}
+\begin{lstlisting}[frame=single,float=!ht,caption={Simple Class Test},captionpos=b,label={lst:simpleclasstest}]
+public class SimpleClassTest {
+    @Test
+    public void SomethingGreater(){
+        SimpleClass h = new SimpleClass();
+        Assert.assertEquals(2,h.something(3));
+    }
+    @Test
+    public void SomethingSmaller(){
+        SimpleClass h = new SimpleClass();
+        Assert.assertEquals(1,h.something(1));
+    }
+}
+\end{lstlisting}
+\begin{lstlisting}[frame=single,float=!ht,caption={Az eszköz kimenete erre a programra},captionpos=b,label={lst:simpleclass_run},language=bash]
+WITHOUT MUTATION
+OK (2 tests)
+ANALYZING TEST [...] testproj/SimpleClassTest.class
+METHOD testproj/SimpleClass/something
+CREATED MUTATION OP7131091982 (IF_ICMPGE->IF_ICMPLT)
+WRITTEN SimpleClass.class.OP7131091982.mutation
+CREATED MUTATION OP7131091984 (INVOKEVIRTUAL->NOP)
+WRITTEN SimpleClass.class.OP7131091984.mutation
+CREATED MUTATION OP7131091986 (IF_ICMPLE->IF_ICMPGT)
+WRITTEN SimpleClass.class.OP7131091986.mutation
+CREATED MUTATION OP71310919810 (IF_ICMPNE->IF_ICMPEQ)
+WRITTEN SimpleClass.class.OP71310919810.mutation
+METHOD testproj/SimpleClass/something
+RUNNING SimpleClass.class.OP71310919810.mutation [testproj.SimpleClass]
+Killed (Tests run: 2,  Failures: 1)
+RUNNING SimpleClass.class.OP7131091982.mutation [testproj.SimpleClass]
+OK (2 tests)
+Survived (OK (2 tests))
+RUNNING SimpleClass.class.OP7131091984.mutation [testproj.SimpleClass]
+OK (2 tests)
+Survived (OK (2 tests))
+RUNNING SimpleClass.class.OP7131091986.mutation [testproj.SimpleClass]
+Killed (Tests run: 2,  Failures: 2)
+testproj.SimpleClass: 2/4
+\end{lstlisting}
+Működés közben az eszköz kiírja a standard outputra az éppen elvégzett feladatot, így könnyen nyomon lehet követni a működését. Az utolsó sorban az eszköz kiírja az egyes osztályokra adott mutációs pontot: ebben az esetben az egyetlen osztály négy mutációjából kettőt sikerült megölni. A kimenetből látható, hogy az eszköz a várt módon működik: a visszaadott értékre hatással lévő elágazások mutációját lebuktatja a teszten belüli assert. A függvény elején lévő elágazást és a függvényhívást viszont a tesztkészlet nem tudta vizsgálni, így a belőlük létrejött mutációk életben maradtak. 
+\subsubsection{Hiányosságok és nehézségek}
+Függvényhívások törlésekor a programom nem tudta lekövetni a stack méretének változtatását. Mivel a program csak magát a hívást detektálta, a függvényparamétereket a stackbe helyező és a visszatérési értéket onnan kivevő utasítások a bytekódban maradtak. A programom arra az esetre jól működhet, amikor a paraméterek mérete és a visszatérési értékek mérete megegyezik (habár ilyenkor sem mindig), egyéb esetben viszont mindig hibát jelez (és ekkor hibásan a megölt mutánsok közé számolja ezt az esetet).
+
+A mutációs teszteszközöm a tesztosztályokra egymástól függetlenül hajtja végre a mutációkat, valamint futtatja azokat, így több tesztosztály esetén elképzelhető, hogy ugyanaz a mutáció többször létrejön, és akár más-más eredményt adnak. Azonban mivel csak a tesztosztályhoz szorosan kapcsolódó (vele egy packageben lévő, egy hívás mélységben lévő) kódra hajt végre mutációkat, illetve általában egy tesztosztály egy unitot tesztel, ez a legtöbb esetben nem probléma.
+\subsubsection{Tesztelés egy nagy projekten}
+A szoftveremet egy nagy projektre is lefuttattam, erre a célra a docx4j (plutext/docx4j) nevű projekt megfelelt, mivel Java nyelvű, kevés külső függőséget alkalmaz, sok teszttel rendelkezik, és Mavenes projekt. Éltem azzal az egyszerűsítéssel, hogy a tesztosztályokból csak hármat hagytam meg, a gyors futás érdekében. 
+
+A projektet lefuttattam a PITesttel is, és törekedtem arra, hogy minél hasonlóbb paraméterezéssel fusson a két program. A mutációs operátorok közül a feltétel negáló és matematikai operátorokat alkalmaztam. A kimeneten~(\ref{resultstable}. táblázat) látszik, hogy sok esetben hasonló eredményre jutott a két eszköz, habár az utolsó osztálynál a saját eszköz furcsa módon az összes mutációt lebuktatta (lehetséges, hogy a mutációk futtatásakor hiba történt).
+
+\begin{table}[]
+\centering
+\def\arraystretch{1.5}
+\begin{tabular}{|l|l|l|}
+\hline
+                                        & \textbf{PITest} & \textbf{Saját eszköz} \\ \hline
+\textbf{org.docx4j.toc.TocGenerator}    & 12/41           & 9/46                  \\ \hline
+\textbf{org.docx4j.wml.SdtBlock}        & 0/8             & 0/20                  \\ \hline
+\textbf{org.docx4j.wml.SdtContentBlock} & 1/3             & 4/4                   \\ \hline
+\textbf{org.docx4j.wml.SdtPr}           & 4/19            & 24/24                 \\ \hline
+\end{tabular}
+\caption{A docx4j mutációs tesztelésének eredménye}
+\label{resultstable}
+\end{table}
+
 \section{Végszó}
+A félévben sikerült mélyebben megismerkednem a mutációs tesztelés lehetőségeivel, technikáival, számba vettem az ehhez szükséges lépéseket, majd kifejlesztettem egy saját eszközt, ami során kitapasztaltam a bytekód manipuláció működését. Az elkészült eszköz kicsi és demonstrációs célra alkalmas, de teljesítményben és lehetőségekben nem tud versenybe szállni a piacon lévő eszközökkel.
+
+Úgy érzem, ezt a témakört a lehetőségekhez mérten kimerítettem, a következőkben a tesztelés egy más témakörével szeretnék majd foglalkozni.
+
 \begin{thebibliography}{9}
+
 \bibitem{major_2011} 
 Rene Just, Franz Schweiggert, and Gregory M. Kapfhammer. 
 \textit{MAJOR: An Efficient and Extensible Tool for Mutation Analysis in a Java Compiler}. 
 \\\texttt{http://people.cs.umass.edu/\textasciitilde rjust/publ/major\textunderscore compiler\textunderscore ase\textunderscore 2011.pdf}
+\bibitem{major_manual} 
+\textit{The Major Mutation Framework Manual}, version 1.3.2 
+\\\texttt{http://mutation-testing.org/doc/major.pdf}
+\bibitem{pit_quickstart} 
+\textit{PIT Quick Start}
+\\\texttt{http://pitest.org/quickstart/}
 \bibitem{so_you_want_to} 
 Henry Coles. 
 \textit{So you want to build a mutation testing system}. 
 \\\texttt{https://github.com/hcoles/pitest/}
+
+
+
 \end{thebibliography}

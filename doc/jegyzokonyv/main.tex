@@ -16,6 +16,15 @@
 \usepackage{setspace}
 \usepackage{parskip}
 \usepackage{anysize}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{positioning}
+
+\tikzstyle{block} = [rectangle, draw,
+    text width=5em, text centered,minimum height=4em,minimum width=7em]
+\tikzstyle{block_rounded} = [rectangle, draw, 
+    text width=5em, text centered, rounded corners, minimum height=4em,minimum width=7em]
+\tikzstyle{line} = [draw, -latex', ultra thick]
 
 % Fo valtozok - KITOLTENDO:
 \newcommand{\authorname}{Szabó Áron}				% A szerző neve
@@ -24,7 +33,7 @@
 \newcommand{\coursecode}{BMEVIMIAL01}						% A tárgy kódja
 \newcommand{\hwtitle}{Mutációs tesztelés}					% A dokumentum címe
 \newcommand{\hw}{Mutációs tesztelés}						% A feladat neve
-\newcommand{\consultant}{Dr. Micskei Zoltán}						% A feladat neve
+\newcommand{\consultant}{Dr. Micskei Zoltán}						% A konzulens neve
 \newcommand{\keywords}{ }				% A feladat neve
 
 \usepackage[
@@ -55,7 +64,7 @@
 
 \lstset{
 	basicstyle=\scriptsize\ttfamily,
-	keywordstyle=\color{black}\bfseries\underbar,
+	keywordstyle=\color{black}\bfseries,
 	identifierstyle=, 		
 	commentstyle=\color{darkgray},
 	stringstyle=\scriptsize\sffamily, 

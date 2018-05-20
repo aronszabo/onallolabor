@@ -1,6 +1,35 @@
 \select@language {magyar} \contentsline {section}{\numberline {1}Bevezet\IeC {\'e}s}{2}{section.1}
 \select@language {magyar} \contentsline {subsection}{\numberline {1.1}Motiv\IeC {\'a}ci\IeC {\'o} \IeC {\'e}s c\IeC {\'e}lkit\IeC {\H u}z\IeC {\'e}s}{2}{subsection.1.1}
+\select@language {magyar} \contentsline {subsection}{\numberline {1.2}A mut\IeC {\'a}ci\IeC {\'o}s tesztel\IeC {\'e}sr\IeC {\H o}l}{2}{subsection.1.2}
 \select@language {magyar} \contentsline {section}{\numberline {2}Elterjedt mut\IeC {\'a}ci\IeC {\'o}s tesztel\IeC {\'e}si eszk\IeC {\"o}z\IeC {\"o}k}{2}{section.2}
-\select@language {magyar} \contentsline {section}{\numberline {3}Mut\IeC {\'a}ci\IeC {\'o}s tesztel\IeC {\'e}si eszk\IeC {\"o}z\IeC {\"o}k fel\IeC {\'e}p\IeC {\'\i }t\IeC {\'e}se}{2}{section.3}
-\select@language {magyar} \contentsline {section}{\numberline {4}Saj\IeC {\'a}t eszk\IeC {\"o}z fejleszt\IeC {\'e}se}{2}{section.4}
-\select@language {magyar} \contentsline {section}{\numberline {5}V\IeC {\'e}gsz\IeC {\'o}}{2}{section.5}
+\select@language {magyar} \contentsline {subsection}{\numberline {2.1}MAJOR Mutation Framework}{2}{subsection.2.1}
+\select@language {magyar} \contentsline {subsection}{\numberline {2.2}PITest}{2}{subsection.2.2}
+\select@language {magyar} \contentsline {section}{\numberline {3}Saj\IeC {\'a}t eszk\IeC {\"o}z megtervez\IeC {\'e}se}{3}{section.3}
+\select@language {magyar} \contentsline {subsection}{\numberline {3.1}Forr\IeC {\'a}sk\IeC {\'o}d vagy bytek\IeC {\'o}d manipul\IeC {\'a}ci\IeC {\'o}?}{3}{subsection.3.1}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.1.1}Forr\IeC {\'a}sk\IeC {\'o}d manipul\IeC {\'a}ci\IeC {\'o}}{3}{subsubsection.3.1.1}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.1.2}Bytek\IeC {\'o}d manipul\IeC {\'a}ci\IeC {\'o}}{4}{subsubsection.3.1.2}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.1.3}Ford\IeC {\'\i }t\IeC {\'o}ba integr\IeC {\'a}lt}{4}{subsubsection.3.1.3}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.1.4}D\IeC {\"o}nt\IeC {\'e}s}{4}{subsubsection.3.1.4}
+\select@language {magyar} \contentsline {subsection}{\numberline {3.2}Lefedett k\IeC {\'o}dok azonos\IeC {\'\i }t\IeC {\'a}sa}{4}{subsection.3.2}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.1}Statikus anal\IeC {\'\i }zis alapj\IeC {\'a}n}{4}{subsubsection.3.2.1}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.2}Elnevez\IeC {\'e}si konvenci\IeC {\'o}k alapj\IeC {\'a}n}{5}{subsubsection.3.2.2}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.3}D\IeC {\"o}nt\IeC {\'e}s}{5}{subsubsection.3.2.3}
+\select@language {magyar} \contentsline {subsection}{\numberline {3.3}Mut\IeC {\'a}ci\IeC {\'o}s oper\IeC {\'a}torok}{5}{subsection.3.3}
+\select@language {magyar} \contentsline {subsection}{\numberline {3.4}Mut\IeC {\'a}ci\IeC {\'o}k beilleszt\IeC {\'e}se k\IeC {\'o}dba}{5}{subsection.3.4}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.4.1}El\IeC {\'a}gaz\IeC {\'a}s-strukt\IeC {\'u}ra}{6}{subsubsection.3.4.1}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.4.2}K\IeC {\"u}l\IeC {\"o}n fileba \IeC {\'\i }r\IeC {\'a}s}{6}{subsubsection.3.4.2}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.4.3}D\IeC {\"o}nt\IeC {\'e}s}{6}{subsubsection.3.4.3}
+\select@language {magyar} \contentsline {subsection}{\numberline {3.5}Tesztek futtat\IeC {\'a}sa, ki\IeC {\'e}rt\IeC {\'e}kel\IeC {\'e}se}{6}{subsection.3.5}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.5.1}Fel\IeC {\"u}gyelet a futtat\IeC {\'a}s felett, p\IeC {\'a}rhuzamos futtat\IeC {\'a}s}{6}{subsubsection.3.5.1}
+\select@language {magyar} \contentsline {subsection}{\numberline {3.6}Kimenet form\IeC {\'a}tuma}{6}{subsection.3.6}
+\select@language {magyar} \contentsline {section}{\numberline {4}Saj\IeC {\'a}t eszk\IeC {\"o}z fejleszt\IeC {\'e}se}{6}{section.4}
+\select@language {magyar} \contentsline {subsection}{\numberline {4.1}Programstrukt\IeC {\'u}ra}{7}{subsection.4.1}
+\select@language {magyar} \contentsline {subsection}{\numberline {4.2}ASM Framework}{7}{subsection.4.2}
+\select@language {magyar} \contentsline {subsection}{\numberline {4.3}A mut\IeC {\'a}nsokat el\IeC {\H o}\IeC {\'a}ll\IeC {\'\i }t\IeC {\'o} Java program}{7}{subsection.4.3}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {4.3.1}Statikus anal\IeC {\'\i }zis}{8}{subsubsection.4.3.1}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {4.3.2}Mutator}{9}{subsubsection.4.3.2}
+\select@language {magyar} \contentsline {subsection}{\numberline {4.4}Shell program}{9}{subsection.4.4}
+\select@language {magyar} \contentsline {subsection}{\numberline {4.5}Kipr\IeC {\'o}b\IeC {\'a}l\IeC {\'a}s}{11}{subsection.4.5}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {4.5.1}Hi\IeC {\'a}nyoss\IeC {\'a}gok \IeC {\'e}s neh\IeC {\'e}zs\IeC {\'e}gek}{12}{subsubsection.4.5.1}
+\select@language {magyar} \contentsline {subsubsection}{\numberline {4.5.2}Tesztel\IeC {\'e}s egy nagy projekten}{12}{subsubsection.4.5.2}
+\select@language {magyar} \contentsline {section}{\numberline {5}V\IeC {\'e}gsz\IeC {\'o}}{12}{section.5}
