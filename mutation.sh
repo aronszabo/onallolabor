@@ -2,7 +2,7 @@
 # $1 = project PATH
 rm -rf "$1/target/arontest-reports"
 mkdir "$1/target/arontest-reports"
-for testclass in $( cd $1 && find target/test-classes -iname "*.class" | cut -d "/" -f3- | rev | cut -d "." -f2- | rev | sed -E "s/\//\./"  )
+for testclass in $( cd $1 && find target/test-classes -iname "*.class" | cut -d "/" -f3- | rev | cut -d "." -f2- | rev | sed -E "s/\//\./g"  )
 do
 
   cd $(dirname $0) && ./mutationtool.sh $1 $testclass

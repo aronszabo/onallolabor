@@ -36,8 +36,9 @@ public class TestClassVisitor extends ClassVisitor{
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-        //System.out.println("@+"+signature);
+
         if(!(name.equals(methodname) || methodname.equals("")))return super.visitMethod(access, name, descriptor, signature, exceptions);
+        //System.out.println("@+"+name);
         return new TestMethodVisitor(DEFAULT_API, super.visitMethod(access, name, descriptor, signature, exceptions),this); //;
     }
 

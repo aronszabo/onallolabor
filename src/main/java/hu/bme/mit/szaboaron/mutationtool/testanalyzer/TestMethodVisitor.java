@@ -14,7 +14,9 @@ public class TestMethodVisitor extends MethodVisitor {
     }
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+
         if(opcode== Opcodes.INVOKEVIRTUAL){
+            //System.out.println(MutationMethodVisitor.ops[opcode]+" : "+owner+"/"+name);
             mtv.pushMethod(new MethodId(owner,name,descriptor,isInterface));
         }
         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);

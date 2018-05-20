@@ -1,5 +1,6 @@
 package hu.bme.mit.szaboaron.mutationtool.mutator;
 
+import hu.bme.mit.szaboaron.mutationtool.testanalyzer.MethodId;
 import org.objectweb.asm.*;
 
 /**
@@ -8,7 +9,8 @@ import org.objectweb.asm.*;
 public class MutationMethodVisitor extends MethodVisitor {
     private Mutation mutation;
     private int opCounter=0;
-    private static String[] ops = {"NOP", "ACONST_NULL", "ICONST_M1", "ICONST_0", "ICONST_1", "ICONST_2", "ICONST_3",
+    private int methodHash;
+    public static final String[] ops = {"NOP", "ACONST_NULL", "ICONST_M1", "ICONST_0", "ICONST_1", "ICONST_2", "ICONST_3",
             "ICONST_4", "ICONST_5", "LCONST_0", "LCONST_1", "FCONST_0", "FCONST_1", "FCONST_2", "DCONST_0", "DCONST_1","BIPUSH","SIPUSH","LDC","","","ILOAD","LLOAD","FLOAD","DLOAD","ALOAD","","","","","","","","","","","","","","","","","","","","",
             "IALOAD", "LALOAD", "FALOAD", "DALOAD", "AALOAD", "BALOAD", "CALOAD", "SALOAD", "ISTORE","LSTORE","FSTORE","DSTORE","ASTORE","","","","","","","","","","","","","","","","","","","","","IASTORE", "LASTORE",
             "FASTORE", "DASTORE", "AASTORE", "BASTORE", "CASTORE", "SASTORE", "POP", "POP2", "DUP", "DUP_X1", "DUP_X2",
@@ -24,13 +26,14 @@ public class MutationMethodVisitor extends MethodVisitor {
             "","MULTIANEWARRAY","IFNULL","IFNONNULL","",""};
 
 
-    public MutationMethodVisitor(int api, MethodVisitor methodVisitor, Mutation mutation) {
+    public MutationMethodVisitor(int api, MethodVisitor methodVisitor, Mutation mutation, int methodHash) {
         super(api, methodVisitor);
         this.mutation=mutation;
+        this.methodHash=methodHash;
     }
     private int mutate(int opcode){
         opCounter++;
-        String opLabel = "OP" + opCounter;
+        String opLabel = "OP" + methodHash + opCounter;
         if(mutation.canMutate(opLabel,opcode)){
             int mutated=mutation.mutate(opLabel,opcode);
             System.out.println("CREATED MUTATION "+opLabel+" ("+ops[opcode]+"->"+ops[mutated]+")");
@@ -68,5 +71,16 @@ public class MutationMethodVisitor extends MethodVisitor {
     public void visitInsn(int opcode) {
         opcode=mutate(opcode);
         super.visitInsn(opcode);
+    }
+    @Override
+    public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+        opcode=mutate(opcode);
+        if(opcode==Opcodes.NOP) {
+            return;
+            //System.out.println(descriptor);
+            //super.visitInsn(Opcodes.POP2);
+        }else {
+            super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+        }
     }
 }

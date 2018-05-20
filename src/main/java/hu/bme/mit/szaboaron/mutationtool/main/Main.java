@@ -20,14 +20,13 @@ public class Main {
     public static void main(String[] args) throws Exception {
         List<MethodId> methods;
         if (args.length>1){
+            System.out.println("ANALYZING TEST "+args[0]+" METHOD "+args[1]);
              methods = TestClassVisitor.analyzeTest(new File(args[0]), args[1]);
         }else{
+            System.out.println("ANALYZING TEST "+args[0]);
              methods = TestClassVisitor.analyzeTest(new File(args[0]), "");
         }
 
-
-
-        String classpath=getClassesPath(new File(args[0]));
         Mutator mutator = new Mutator();
         mutator.addMutationOperator(Opcodes.IF_ICMPEQ, Opcodes.IF_ICMPNE);
         mutator.addMutationOperator(Opcodes.IF_ICMPNE, Opcodes.IF_ICMPEQ);
@@ -49,12 +48,16 @@ public class Main {
         mutator.addMutationOperator(Opcodes.DSUB, Opcodes.DADD);
         mutator.addMutationOperator(Opcodes.LSUB, Opcodes.LADD);
         mutator.addMutationOperator(Opcodes.ISUB, Opcodes.IADD);
-
+        mutator.addMutationOperator(Opcodes.IFNULL, Opcodes.IFNONNULL);
+        mutator.addMutationOperator(Opcodes.IFNONNULL, Opcodes.IFNULL);
+        //mutator.addMutationOperator(Opcodes.INVOKEVIRTUAL, Opcodes.NOP);
+        //mutator.addMutationOperator(Opcodes.INVOKESTATIC, Opcodes.NOP);
+        //mutator.addMutationOperator(Opcodes.INVOKEINTERFACE, Opcodes.NOP);
+        String classpath=getClassesPath(new File(args[0]));
         for(MethodId method : methods){
             System.out.println("METHOD "+method.owner+"/"+ method.name);
             MutationClassVisitor.mutateMethod(method,classpath,mutator);
         }
-
     }
     private static String getClassesPath(File testPath){
         // todo https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html

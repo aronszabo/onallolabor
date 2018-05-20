@@ -6,7 +6,7 @@ BASEDIR=$(dirname $0)
 echo "WITHOUT MUTATION"
 java -cp "$BASEDIR/lib/*:$1/target/test-classes:$1/target/classes" org.junit.runner.JUnitCore $2 | grep "Tests run\|OK"
 
-testclass=$(echo $2 | sed -E "s/\./\//")
+testclass=$(echo $2 | sed -E "s/\./\//g")
 java -cp "$BASEDIR/target/classes:$BASEDIR/lib/*" hu.bme.mit.szaboaron.mutationtool.main.Main "$1/target/test-classes/$testclass.class"
 # for tester in $testnames
 # do
@@ -28,11 +28,13 @@ do
   clsname=$(echo $clsname | sed -E "s/\//\./g" | cut -d "." -f4- )
 
   echo "RUNNING $(basename $mut) [$clsname]"
-  result=$(java -cp "$BASEDIR/lib/*:$1/target/test-classes:$1/target/classes" org.junit.runner.JUnitCore $2 | grep "Tests run\|OK")
+  result=$(java -cp "$BASEDIR/lib/*:$1/target/test-classes:$1/target/classes:$1/target/dependency/*" org.junit.runner.JUnitCore $2| grep "Tests run\|OK") #   | tee /dev/tty 
   if echo $result | grep "OK"; then
     echo "0" >> "$1/target/arontest-reports/$clsname"
+    echo "Survived ($result)"
   else
     echo "1" >> "$1/target/arontest-reports/$clsname"
+    echo "Killed ($result)"
   fi
   rm $realname
 done
